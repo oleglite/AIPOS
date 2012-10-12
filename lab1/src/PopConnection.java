@@ -10,19 +10,37 @@ public class PopConnection {
 	private Socket mSocket;
 	private BufferedReader mInput;
 	private PrintWriter mOutput;
+	private Proxy mProxy;
 
 	private boolean isConnected = false;
 	private boolean isLoggedIn = false;
 
 	private String mLog = "";
 	private String mLastReceivedMessage;
+	
+	public void setProxy(String proxyAddress, int proxyPort, final String proxyLogin, final String proxyPassword) {
+		Authenticator.setDefault(new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				PasswordAuthentication p = new PasswordAuthentication(proxyLogin, proxyPassword.toCharArray());
+				return p;
+			}
+		});
+		
+		mProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, proxyPort));
+	}
 
 	/** Подключиться к серверу
 	 * @param server - адрес сервера, к которому подключаемся
 	 * @param port - порт подключения
 	 */
 	public void connect(String server, int port) throws UnknownHostException, IOException {
-		mSocket = new Socket(server, port);
+		if(mProxy == null) {
+			mSocket = new Socket(server, port);
+		} else {
+			mSocket = new Socket(mProxy);
+			mSocket.connect(new InetSocketAddress(server, port));
+		}
+		
 		mSocket.setSoTimeout(600);
 
 		mInput = new BufferedReader(new InputStreamReader(mSocket.getInputStream(), "UTF-8"));
@@ -71,7 +89,11 @@ public class PopConnection {
 		if(!isLoggedIn)
 			throw new Exception("you are not logged in");
 		sendRequest("RETR " + number);
-		Email email = new Email(mLastReceivedMessage, "CP866");/*
+		Email email = new Email(mLastReceivedMessage, "CP866");
+		
+		System.out.println(mLastReceivedMessage);
+		
+		/*
 		System.out.println(mLastReceivedMessage);
 		System.out.println(email.getFieldDate() + " | " + email.getFieldFrom() + " | " + email.getFieldSubject());
 		System.out.println(email.getFieldMessage());

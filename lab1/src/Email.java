@@ -100,6 +100,9 @@ public class Email {
 				int base64ContentBegin = content.indexOf("\n\n") + 2;
 				String base64Content = content.substring(base64ContentBegin).replace("\n", "");
 				mFieldMessage += fromBase64(base64Content, charset) + "\n";
+			} else {
+				int contentBegin = content.indexOf("\n\n") + 2;
+				mFieldMessage += content.substring(contentBegin) + "\n";
 			}
 		} else if(content.substring(contentTypeIndex + 14).startsWith("image/png")) {
 			if(content.indexOf("Content-Transfer-Encoding: base64") >= 0) {

@@ -1,41 +1,21 @@
-//package by.bsuir.iit.aipos.popclient;
+package by.bsuir.iit.aipos.popclient;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.List;
 
+/** Главное окно
+ *
+ */
 public class MainFrame extends JFrame {
 
 	PopConnection popCon = new PopConnection();
 
 	public static int Default_Width = 1000;
-	public static int Default_Height = 500;
+	public static int Default_Height = 300;
 
 
-	// #0_1
-	// Proxy
-	JLabel proxyUserLabel;
-	JLabel proxyPassLabel;
-
-	JTextField proxyUserTextField;
-	JTextField proxyPassTextField;
-
-	JButton proxyButton;
-	Box proxyUserBox;
-	Box proxyPassBox;
-
-	// для кнопки ввод данных
-	Box proxyEnterBox;
-	
 	// #0_2
 	// ввод адреса сервера и порта
 	JLabel serverAddressLabel;
@@ -43,10 +23,7 @@ public class MainFrame extends JFrame {
 
 	JTextField serverAddressTextField;
 	JTextField serverPortTextField;
-	JButton serverEnterButton;
 	Box serverBox;
-	// для кнопки ввод данных
-	Box serverEnterBox;
 	// #1
 	// ввести логин
 	JLabel serverLoginLabel;
@@ -61,8 +38,7 @@ public class MainFrame extends JFrame {
 	// #3
 	// ввод логина и пароля , проверка статуса
 	JButton enterButton;
-	JButton statusButton;
-	Box enterAndStatusBox;
+	Box entersBox;
 
 	// #5
 	// получить n-е письмо
@@ -70,16 +46,16 @@ public class MainFrame extends JFrame {
 	JButton getLetterButton;
 	JTextField getLetterTextField;
 	Box getLetterBox;
+
+	JLabel folderNameLabel;
+	JTextField folderNameTextField;
+	Box folderNameBox;
+
 	// #6
 	// закрыть все соединения
 	JLabel closeConnectionLabel;
 	JButton closeConnectionButton;
 	Box closeConnectionBox;
-	// #7
-	// Получить полную историю работы с сервером
-	JLabel getStoryLabel;
-	JButton getStoryButton;
-	Box getStoryBox;
 
 	// #10
 	Box mainTextAreaBox;
@@ -94,34 +70,6 @@ public class MainFrame extends JFrame {
 		setTitle("pop3 client v.0.1.0 beta ");
 
 		// создание верхнего горизонтального блока
-
-		// Proxy
-
-		proxyUserLabel = new JLabel("Имя пользователя");
-		proxyPassLabel = new JLabel("Пароль");
-
-		proxyUserTextField = new JTextField(10);
-		proxyPassTextField = new JTextField(10);
-
-		proxyUserTextField.setMaximumSize(proxyUserTextField.getPreferredSize());
-		proxyPassTextField.setMaximumSize(proxyPassTextField.getPreferredSize());
-		proxyUserBox = Box.createHorizontalBox();
-		proxyUserBox.add(proxyUserLabel);
-		proxyUserBox.add(Box.createHorizontalStrut(3));
-		proxyUserBox.add(proxyUserTextField);
-		proxyUserBox.add(proxyPassLabel);
-		proxyUserBox.add(Box.createHorizontalStrut(3));
-		proxyUserBox.add(proxyPassTextField);
-
-		proxyButton = new JButton("ввод данных");
-		proxyEnterBox = Box.createHorizontalBox();
-		proxyEnterBox.add(proxyButton);
-
-		proxyButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				mainTextArea.append("ввести пароль и " + "логин\n");
-			}
-		});
 
 		// ввод адреса сервера и порта
 		serverAddressLabel = new JLabel("Адрес сервера");
@@ -141,29 +89,6 @@ public class MainFrame extends JFrame {
 		serverBox.add(Box.createHorizontalStrut(6));
 		serverBox.add(serverPortTextField);
 
-		serverEnterButton = new JButton("ввод данных");
-		serverEnterBox = Box.createHorizontalBox();
-		serverEnterBox.add(serverEnterButton);
-
-		serverEnterButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event)
-					throws NumberFormatException {
-				try {
-					String server = serverAddressTextField.getText();
-					String string_port = serverPortTextField.getText();
-					int port = Integer.parseInt(string_port);
-
-					popCon.connect(server, port);
-					mainTextArea.append(server);
-					mainTextArea.append(string_port);
-					mainTextArea.append("ok\n");
-				} catch (IOException UnknownHostException) {
-
-				}
-			}
-
-		});
 		// login
 		serverLoginLabel = new JLabel("Логин");
 		// textfield1 = new JTextField(10);
@@ -184,60 +109,58 @@ public class MainFrame extends JFrame {
 		serverPassBox.add(Box.createHorizontalStrut(10));
 		serverPassBox.add(serverPassTextField);
 
-		enterButton = new JButton("ENTER");
-		statusButton = new JButton("Status");
-		enterAndStatusBox = Box.createHorizontalBox();
-		enterAndStatusBox.add(enterButton);
-		enterAndStatusBox.add(Box.createHorizontalStrut(30));
-		enterAndStatusBox.add(statusButton);
+		enterButton = new JButton("подключиться");
+		entersBox = Box.createHorizontalBox();
+		entersBox.add(enterButton);
+		entersBox.add(Box.createHorizontalStrut(30));
 
 		// ввод логина и пароля
 		enterButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				try {
+					String server = serverAddressTextField.getText();
+					String string_port = serverPortTextField.getText();
+					int port = Integer.parseInt(string_port);
+
+					popCon.connect(server, port);
 
 					String userLogin = serverLoginTextField.getText();
 					String userPassword = serverPassTextField.getText();
 
 					popCon.login(userLogin, userPassword);
-					mainTextArea.append(userLogin);
-					mainTextArea.append(userPassword);
-					mainTextArea.append("ok2\n");
-				} catch (Exception e) {
-					mainTextArea.append("you are not connected to the server\n");
-					System.out.print(e.toString());
-				}
-			}
-		});
-		// проверка статуса
-
-		statusButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				try {
 
 					String str = popCon.status();
-					mainTextArea.append(str);
-					mainTextArea.append("ok2\n");
+
+					mainTextArea.setText(popCon.getLog());
 				} catch (Exception e) {
-					mainTextArea.append("you are not logged in\n");
-					System.out.print(e.toString());
+					mainTextArea.setText(popCon.getLog() + "\n\r" + e.getMessage());
 				}
 			}
 		});
-		
+
 		getLetterLabel = new JLabel("Номер письма");
 		getLetterTextField = new JTextField(5);
 		getLetterTextField.setMaximumSize(getLetterTextField.getPreferredSize());
 		getLetterButton = new JButton("Получить письмо");
 
+
+
 		getLetterBox = Box.createHorizontalBox();
 		getLetterBox.add(getLetterLabel);
-		getLetterBox.add(Box.createHorizontalStrut(10));
+		getLetterBox.add(Box.createHorizontalStrut(4));
 		getLetterBox.add(getLetterTextField);
-		getLetterBox.add(Box.createHorizontalStrut(9));
+		getLetterBox.add(Box.createHorizontalStrut(4));
 		getLetterBox.add(getLetterButton);
+
+		folderNameLabel = new JLabel("Папка для сохранения");
+		folderNameTextField = new JTextField("D:/021702/mail");
+		folderNameTextField.setMaximumSize(new Dimension(140, 20));
+		folderNameBox = Box.createHorizontalBox();
+		folderNameBox.add(folderNameLabel);
+		folderNameBox.add(Box.createHorizontalStrut(5));
+		folderNameBox.add(folderNameTextField);
+
 
 		getLetterButton.addActionListener(new ActionListener() {
 			@Override
@@ -247,16 +170,12 @@ public class MainFrame extends JFrame {
 					int n = Integer.parseInt(str1);
 
 					Email email = popCon.retrieve(n);
-					mainTextArea.append("\nПисьмо номер " + str1 + "\n");
-					mainTextArea.append("Отправитель: " + email.getFieldFrom() + "\n");
-					mainTextArea.append("Дата: " + email.getFieldDate() + "\n");
-					mainTextArea.append("Тема: " + email.getFieldSubject() + "\n");
-					mainTextArea.append("Прикреплено изображений: " + email.getReceivedImages().size() + "\n");
-					mainTextArea.append("Сообщение:\n\n" + email.getFieldMessage());
+					email.saveImage(folderNameTextField.getText());
+					email.saveMail(folderNameTextField.getText());
+					mainTextArea.setText(popCon.getLog());
 
 				} catch (Exception e) {
-					mainTextArea.append("you are not logged in\n");
-					System.out.print(e.toString());
+					mainTextArea.setText(popCon.getLog() + "\n\r" + e.getMessage());
 				}
 			}
 		});
@@ -271,50 +190,26 @@ public class MainFrame extends JFrame {
 				try {
 
 					popCon.close();
-
-					mainTextArea.append("exit");
-					System.exit(1);
+					mainTextArea.setText(popCon.getLog());
 
 				} catch (Exception e) {
-					mainTextArea.append("not exit");
-					System.out.print(e.toString());
+					mainTextArea.setText(popCon.getLog() + "\n\r" + e.getMessage());
 				}
 			}
 		});
-		// получить всю историю с сервером
-		getStoryButton = new JButton("Получить историю работы с сервером");
-		getStoryBox = Box.createHorizontalBox();
-		getStoryBox.add(Box.createHorizontalStrut(5));
-		getStoryBox.add(getStoryButton);
 
-		getStoryButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				try {
-
-					String str = popCon.getLog();
-					mainTextArea.append(str);
-					mainTextArea.append("ok2");
-				} catch (Exception e) {
-					mainTextArea.append("not history");
-					System.out.print(e.toString());
-				}
-			}
-		});
 
 		// добавляем горизонтальные блоки в левый вертикальный блок
 		// т.е объединим строки(hbox1,hbox2,hbox3) в один вертикальный
 		Box vboxleft = Box.createVerticalBox();
-		vboxleft.add(proxyUserBox);
-		vboxleft.add(proxyEnterBox);
+		//vboxleft.add(proxyUserBox);
+		//vboxleft.add(proxyEnterBox);
 		vboxleft.add(serverBox);
-		vboxleft.add(serverEnterBox);
 		vboxleft.add(serverLoginBox);
 		vboxleft.add(serverPassBox);
-		vboxleft.add(enterAndStatusBox);
-		//vboxleft.add(hbox4);
+		vboxleft.add(entersBox);
+		vboxleft.add(folderNameBox);
 		vboxleft.add(getLetterBox);
-		vboxleft.add(getStoryBox);
 		vboxleft.add(closeConnectionBox);
 
 		// добавим memo в горизонтальный hbox4
